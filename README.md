@@ -1,2 +1,4 @@
-# Marescot_Franz_Benhaiem_2021_JAnimEcol
-"‘Keeping the kids at home’ can limit the persistence of contagious pathogens in social animals. can limit the persistence of contagious pathogens in social animals."
+# Marescot, Franz, Benhaiem et al. 2020 *Journal of Animal Ecology*
+> **Lucile Marescot**, **Mathias Franz**, **Sarah Benhaiem**, **Heribert Hofer**, **Cédric Scherer**, **Marion L. East** & **Stephanie Kramer-Schadt** (accepted) "‘Keeping the kids at home’ can limit the persistence of contagious pathogens in social animals. can limit the persistence of contagious pathogens in social animals." *Journal of Animal Ecology**.
+
+The purpose of our conceptual model was to assess whether and how an age-dependent pattern of between-group interactions, which increases social network modularity, consistently increased the probability of epidemic fade-out across a large range of host and pathogen life history traits. This trait occurs in social species with communal nurseries where juveniles have no contact with members of other social groups during their development. We modelled a contagious pathogen spreading through physical contact and/or spatial proximity, e.g., via aerosols, and inducing lifelong immunity following infection. All model parameters below can easily be changed to tailor the model to host-specific life histories and pathogen traits.
