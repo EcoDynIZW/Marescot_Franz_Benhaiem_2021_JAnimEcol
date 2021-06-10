@@ -1,0 +1,253 @@
+---
+title: "IBM Den: Figure 3" 
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    highlight: kate
+    code_folding: true 
+    toc: true            
+    toc_depth: 2         
+editor_options: 
+  chunk_output_type: console
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      retina = 1, dev = "ragg_png")
+```
+
+
+# Setup
+
+```{r packages}
+library(tidyverse)
+library(rpart)       ## performing regression trees
+library(ggdendro)
+library(ggtext)
+library(systemfonts)
+library(rcartocolor)
+library(colorspace)
+```
+
+
+# Data
+
+```{r data-prep}
+output <- 
+  readr::read_csv(
+    here::here("data", "YBC_Continuous_Breeding continuous_breeding-table.csv"), 
+    skip = 6
+  ) %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    transmission = if_else(frequency_transmission == TRUE, "Frequency", "Density"),
+    ext = if_else(ext == "extinct", 1, 0),
+    modularity = 0.1 / within_group_contact
+  )
+
+select <-
+  data.frame(
+    ext = output$ext,
+    immunity_barrier = output$immunity_barrier,
+    modularity = output$modularity,
+    between_group_contact = output$between_group_contact,
+    infection_length = output$infection_length,
+    virulence = output$virulence,
+    group_size = output$group_size,
+    transmission = output$transmission    
+  )
+
+gridim <- data.frame(NULL)
+
+tabpar <-
+  expand.grid(
+    unique(output$modularity),
+    unique(output$infection_length),
+    unique(output$virulence),
+    unique(output$group_size),
+    unique(output$fertility),
+    unique(output$transmission),
+    unique(output$survival)
+  )
+
+colnames(tabpar) <- c("modularity",
+                      "infection_length",
+                      "virulence",
+                      "group_size",
+                      "fertility",
+                      "transmission",
+                      "survival")
+
+for (r in 1:nrow(tabpar)) {
+  select <-
+    subset(
+      output,
+      modularity == tabpar[r, "modularity"] &
+      group_size == tabpar[r, "group_size"] &
+      virulence == tabpar[r, "virulence"] &
+      infection_length == tabpar[r, "infection_length"] &
+      fertility == tabpar[r, "fertility"] & 
+      transmission == tabpar[r, "transmission"] &
+      survival == tabpar[r, "survival"]
+    )
+  
+  extinction <-
+    aggregate(select$ext, list(rnot = select$rnot, 
+                               age = select$immunity_barrier), sum)
+  outof <-
+    aggregate(select$ext, list(rnot = select$rnot, 
+                               age = select$immunity_barrier), length)
+  
+  gridim <-
+    rbind(
+      cbind(
+        extinction,
+        outof$x,
+        rep(tabpar[r, "modularity"], nrow(extinction)),
+        rep(tabpar[r, "infection_length"], nrow(extinction)),
+        rep(tabpar[r, "virulence"], nrow(extinction)),
+        rep(tabpar[r, "group_size"], nrow(extinction)), 
+        rep(tabpar[r, "fertility"], nrow(extinction)),  
+        rep(tabpar[r, "transmission"], nrow(extinction)), 
+        rep(tabpar[r, "survival"], nrow(extinction))), gridim)
+}
+
+colnames(gridim) = c("R0",
+                     "immunity_barrier",
+                     "extinction",
+                     "samplesize",
+                     "association",
+                     "infection_length",
+                     "virulence",
+                     "group_size",
+                     "fertility",
+                     "transmission",
+                     "survival")
+
+immunity <- subset(gridim, immunity_barrier == 52)
+noimmunity <- subset(gridim, immunity_barrier == 1)
+immunity$diff <- (immunity$extinction - noimmunity$extinction) / 30
+#hist(immunity$diff)
+immunity$contact_ratio <- immunity$association
+immunity$trans <- as.numeric(immunity$transmission)
+
+m1 <- rpart(
+  formula = diff ~ R0 + contact_ratio + infection_length + virulence + 
+              survival + fertility + group_size + transmission, 
+  data = immunity, method = "anova"
+)
+
+
+#immunity<-as.data.frame(immunity)
+#tree.fit <- tree(diff ~ R0 + contact.ratio + infection_length + virulence + survival + fertility + group_size + transmission, data=immunity, method = "recursive.partition")
+```
+
+# Tree Graph Preparation
+
+```{r graph-data}
+tree_data <- dendro_data(model = m1, type = "proportional")
+
+## plain-bold labels # SB changes here only
+tree_data$labels$label <- c("**R<sub>0</sub>** < 7.5", 
+                            "**R<sub>0</sub>** < 3.5", 
+                            "**fertility** < 0.0375", 
+                            "**fertility** < 0.0175", 
+                            "**virulence** \u2265 0.025",   
+                            "**infection length** \u2265 15", 
+                            "**group size** \u2265 30", 
+                            "**virulence** \u2265 0.075", 
+                            "**transmission** = density", 
+                            "**contact ratio** < 0.6", 
+                            "**fertility** < 0.0375", 
+                            "**virulence** \u2265 0.075",
+                            "**group size** \u2265 75") 
+
+tree_data$leaf_labels$labels <-
+  m1$frame %>% 
+  as_tibble() %>% 
+  mutate(prop = round(n / max(n) * 100, 0)) %>% 
+  filter(prop < 100, var == "<leaf>") %>% 
+  mutate(label = glue::glue("<b style='font-size:10pt;'>{format(yval, digits = 1)}</b><br>n={n} ({prop}%)")) %>% 
+  #mutate(label = paste0("<b style='font-size:10pt;'>", format(yval, digits = 1), "</b><br>n=", n, " (", prop, "%)")) %>% 
+  pull(label)
+```
+
+
+# Figure
+
+```{r plot, fig.width=12, fig.height=9}
+ggplot(segment(tree_data)) +
+  geom_segment(aes(x = x, 
+                   y = y, 
+                   xend = xend, 
+                   yend = yend), #color = n), ## for fitting with the {tree} package
+               color = "grey30",
+               size = 0.8) +
+  geom_richtext(data = label(tree_data), 
+                aes(x = x, 
+                    y = y, 
+                    label = label), 
+                size = 3.4,
+                family = "Times New Roman",
+                #fontface = "bold", ## comment for bold-plain labels
+                hjust = .5, 
+                vjust = -0.2,
+                label.padding = unit(c(0.4, 0.3, 0.25, 0.3), "lines")) +
+  geom_rect(data = leaf_label(tree_data), 
+            aes(xmin = x - .48, xmax = x + .48, 
+                ymin = y - .014, ymax = y, 
+                fill = as.numeric(as.character(label)),
+                fill = after_scale(lighten(fill, .25)))
+  ) +
+  geom_richtext(data = leaf_label(tree_data), 
+                aes(x = x, 
+                    y = y, 
+                    label = labels),
+                size = 3.1,
+                family = "Times New Roman",
+                fill = NA, 
+                lineheight = 1.25,
+                label.color = NA,
+                vjust = 1.06) +
+  scale_x_continuous(expand = c(.04, .04)) +
+  scale_y_continuous(expand = c(.02, .02)) +
+  scale_fill_carto_c(palette = "Emrld",
+                     name = "Differences between scenarios in\nepidemic fade-out probabilities",
+                     limits = c(0, 1),
+                     breaks = seq(0, 1, by = .1)) +
+  guides(fill = guide_colorbar(direction = "horizontal",
+                                title.position = "top",
+                                title.hjust = .5,
+                                label.position = "bottom",
+                                label.hjust = .5,
+                                barwidth = unit(15, "lines"),
+                                barheight = unit(.3, "lines"))) +
+  theme_dendro() +
+  theme(legend.position = c(.78, .8),
+        legend.title = element_text(family = "Times New Roman", face = "bold", size = 13),
+        legend.text = element_text(family = "Times New Roman", size = 11),
+        plot.margin = margin(0, 0, -10, 0))
+
+ggsave(here::here("figures", "fig_3_new_labs.pdf"), width = 12, height = 9, device = cairo_pdf)
+```
+
+***
+  
+<details><summary>Session Info</summary>
+  
+```{r sessionInfo}
+## DO NOT REMOVE!
+Sys.time()
+#git2r::repository() ## uncomment if you are using GitHub
+sessionInfo()
+```
+
+</details>
+  
+
+
+
+
+
+
+
