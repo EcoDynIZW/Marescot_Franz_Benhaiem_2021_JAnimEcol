@@ -24,3 +24,6 @@ render_all_reports <- function() {
 }
 
 render_all_reports()
+
+source(here("R", "00_convert_figures.R"))
+
