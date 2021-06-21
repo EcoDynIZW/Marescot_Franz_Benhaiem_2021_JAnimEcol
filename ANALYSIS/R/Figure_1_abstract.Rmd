@@ -1,5 +1,5 @@
 ---
-title: "IBM Den: Figure S1" 
+title: "IBM Den: Figure 1" 
 date: "`r Sys.Date()`"
 output: 
     distill::distill_article:
@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
 ```{r packages}
 library(tidyverse)
 library(ragg)
+library(colorspace)
 ```
 
 
@@ -30,7 +31,7 @@ library(ragg)
 ```{r data-prep}
 output <- 
   readr::read_csv(
-    here::here("data", "YBC_Birth_Pulse experiment_birth_pulse-table.csv"), 
+    here::here("data", "YBC_Continuous_Breeding continuous_breeding-table.csv"), 
     skip = 6
   ) %>% 
   janitor::clean_names() %>% 
@@ -51,14 +52,14 @@ gridim[which(gridim$`Between-group contact` == 1), "Between-group contact"]<-"Ba
 # Figure
 
 ```{r plot, fig.width=8, fig.height=5}
-theme_custom <-
-  theme_classic(base_size = 16, base_family = "Times New Roman") +
+theme_lucile <-
+  theme_classic(base_size = 16, base_family = "Bitter") +
   theme(axis.title.x = element_text(size = 16, margin = margin(t = 15)),
         axis.title.y = element_text(size = 16, margin = margin(r = 15)),
         axis.line = element_line(colour = 'black', size = .8),
         axis.ticks = element_line(size = .8), 
         axis.ticks.length = unit(.3, "cm"),
-        legend.position = c(.7, .63),
+        legend.position = c(.7, .85),
         legend.title = element_text(size = 16, face = "bold"),
         legend.text = element_text(size = 14),
         legend.key.width = unit(3, "lines"),
@@ -82,9 +83,10 @@ ggplot(gridim,
                      breaks = c("Communal nursery", "Baseline"))+
   labs(x = expression("Basic reproduction number R"[0]),
        y = "Epidemic fade-out probability") +
-  theme_custom
+  theme_lucile +
+  theme(legend.background = element_rect(fill = "transparent", color = "transparent"))
 
-ggsave(here::here("figures", "fig_S1.pdf"), width = 8, height = 5, device = cairo_pdf)
+ggsave(here::here("figures", "fig_1_abstract.pdf"), width = 7, height = 4, device = cairo_pdf)
 ```
 
 ***

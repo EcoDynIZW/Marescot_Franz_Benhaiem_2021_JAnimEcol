@@ -63,7 +63,7 @@ results_all <-
 # Figure
 
 ```{r plot, fig.width=16, fig.height=11}
-theme_custom <-
+theme_lucile <-
   theme_classic(base_size = 18, base_family = "Times New Roman") +
   theme(axis.title.x = element_text(margin = margin(t = 15)),
         axis.title.y = element_markdown(hjust = .4, margin = margin(r = 15)),
@@ -123,7 +123,7 @@ plot_a_proto <-
     scale_color_manual(values = c(colorspace::darken("#0090f7", .4), "#0090f7")) +
     scale_fill_manual(values = c(colorspace::darken("#0090f7", .4), "#0090f7")) +
     scale_linetype_manual(values = c("solid", 32)) +
-    theme_custom +
+    theme_lucile +
     labs(
       x = "Time (weeks)", 
       y = "&#35; of susceptibles&nbsp;&nbsp;*S*", 
@@ -172,7 +172,7 @@ plot_b <-
   ) +
   scale_color_manual(values = c(colorspace::darken("#f20000", .4), "#f20000")) +
   scale_linetype_manual(values = c("solid", 32)) +
-  theme_custom +
+  theme_lucile +
   labs(
     x = "Time (weeks)", 
     y = "&#35; of infected&nbsp;&nbsp;*I*", 
@@ -202,7 +202,7 @@ plot_c <-
   ) +
   scale_color_manual(values = c(colorspace::darken("#00de6f", .4), "#00de6f")) +
   scale_linetype_manual(values = c("solid", 32)) +
-  theme_custom +
+  theme_lucile +
   labs(
     x = "Time (weeks)", 
     y = "&#35; of recovered&nbsp;&nbsp;*R*",
@@ -234,7 +234,7 @@ plot_d <-
     ) +
     scale_color_manual(values = c(colorspace::darken("#0090f7", .4), "#0090f7")) +
     scale_linetype_manual(values = c("solid", 32)) +
-    theme_custom +
+    theme_lucile +
     labs(
       x = "Time (weeks)", 
       y = "&#35; of susceptibles&nbsp;&nbsp;*S*", 
@@ -264,7 +264,7 @@ plot_e <-
   ) +
   scale_color_manual(values = c(colorspace::darken("#f20000", .4), "#f20000")) +
   scale_linetype_manual(values = c("solid", 32)) +
-  theme_custom +
+  theme_lucile +
   labs(
     x = "Time (weeks)", 
     y = "&#35; of infected&nbsp;&nbsp;*I*", 
@@ -294,7 +294,7 @@ plot_f <-
   ) +
   scale_color_manual(values = c(colorspace::darken("#00de6f", .4), "#00de6f")) +
   scale_linetype_manual(values = c("solid", 32)) +
-  theme_custom +
+  theme_lucile +
   labs(
     x = "Time (weeks)", 
     y = "&#35; of recovered&nbsp;&nbsp;*R*", 
@@ -313,7 +313,7 @@ title_1 <- plot_title +
             family = "Times New Roman", size = 10, fontface = "bold")
   
 title_2 <- plot_title + 
-  geom_text(aes(label = "Baseline scenario"), 
+  geom_text(aes(label = "Baseline"), 
             family = "Times New Roman", size = 10, fontface = "bold")
 
 ## FULL PANEL

@@ -109,7 +109,7 @@ df_vecbis_b <- as_tibble(vecbis_b) %>%
 # Figure
 
 ```{r plot, fig.width=10, fig.height=13.5}
-theme_custom <-
+theme_lucile <-
   theme_classic(base_size = 18, base_family = "Times New Roman") +
   theme(axis.title.x = element_text(size = 19, margin = margin(t = 15)),
         axis.title.y = element_text(size = 19, margin = margin(r = 8)),
@@ -162,7 +162,7 @@ b <-
          y = "Proportion of groups", 
          title = "Communal nursery", 
          tag = expression(paste("(", italic("b"), ")"))) +
-    theme_custom
+    theme_lucile
 
 labs_c <-
   tibble(
@@ -192,9 +192,9 @@ c <-
     scale_fill_manual(values = colors_pale) +
     labs(x = "Weeks", 
          y = "Proportion of groups", 
-         title = "Baseline scenario", 
+         title = "Baseline", 
          tag = expression(paste("(", italic("c"), ")"))) +
-    theme_custom
+    theme_lucile
 
 
 a / b / c

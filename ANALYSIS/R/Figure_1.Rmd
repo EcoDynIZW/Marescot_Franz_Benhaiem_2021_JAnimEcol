@@ -46,13 +46,13 @@ gridim <- aggregate(output[,"ext"], list(rnot = output$rnot, age =   output[,"im
 colnames(gridim) = c("Basic reproduction number R0", "Between-group contact", "Epidemic fade-out probability")
 
 gridim[which(gridim$`Between-group contact` == 52), "Between-group contact"]<-"Communal nursery"
-gridim[which(gridim$`Between-group contact` == 1), "Between-group contact"]<-"Baseline scenario" 
+gridim[which(gridim$`Between-group contact` == 1), "Between-group contact"]<-"Baseline" 
 ```
 
 # Figure
 
 ```{r plot, fig.width=8, fig.height=5}
-theme_custom <-
+theme_lucile <-
   theme_classic(base_size = 16, base_family = "Times New Roman") +
   theme(axis.title.x = element_text(size = 16, margin = margin(t = 15)),
         axis.title.y = element_text(size = 16, margin = margin(r = 15)),
@@ -78,12 +78,12 @@ ggplot(gridim,
   scale_x_continuous(breaks = c(1, 2, 5, 10, 20)) +
   scale_y_continuous(limits = c(.48, 1), expand = c(0, 0)) +
   scale_color_manual(values = c("#7d408a", "#eb6f6c"), 
-                     breaks = c("Communal nursery", "Baseline scenario")) +
+                     breaks = c("Communal nursery", "Baseline")) +
   scale_shape_manual(values = c(16, 21), 
-                     breaks = c("Communal nursery", "Baseline scenario"))+
+                     breaks = c("Communal nursery", "Baseline"))+
   labs(x = expression("Basic reproduction number R"[0]),
        y = "Epidemic fade-out probability") +
-  theme_custom
+  theme_lucile
 
 ggsave(here::here("figures", "fig_1.pdf"), width = 8, height = 5, device = cairo_pdf)
 ```
